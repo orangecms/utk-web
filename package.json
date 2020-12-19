@@ -36,6 +36,7 @@
     "prop-types": "^15.7.2",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
+    "react-sage": "^0.1.5",
     "styled-jsx": "^3.3.2"
   },
   "devDependencies": {
