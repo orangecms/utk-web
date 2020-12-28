@@ -6,9 +6,10 @@ module.exports = {
   basePath: isProd ? "/utk-web" : "",
   webpack(config) {
     config.module.rules.push({
-      test: /\.wasm$/,
-      loaders: ["wasm-loader"],
+      test: /\.go$/,
+      loader: "golang-wasm-async-loader2",
     });
+    config.node.fs = "empty";
     return config;
   },
 };
