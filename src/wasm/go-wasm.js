@@ -24,13 +24,17 @@
     );
   }
 
-  const enosys = () => {
-    const err = new Error("not implemented");
+  const enosys = (syscall) => {
+    const err = new Error(
+      syscall ? `${syscall} not implemented` : "not implemented"
+    );
     err.code = "ENOSYS";
+    console.error(err);
     return err;
   };
 
-  if (!global.fs) {
+  if (1 || !global.fs) {
+    console.info("Injecting fs implementation");
     let outputBuf = "";
     global.fs = {
       constants: {
@@ -74,7 +78,7 @@
         callback(enosys());
       },
       fstat(fd, callback) {
-        callback(enosys());
+        callback(enosys("fstat"));
       },
       fsync(fd, callback) {
         callback(null);
@@ -88,6 +92,15 @@
       link(path, link, callback) {
         callback(enosys());
       },
+      llseek() {
+        console.info("seek");
+      },
+      seek() {
+        console.info("seek");
+      },
+      lseek() {
+        console.info("seek");
+      },
       lstat(path, callback) {
         callback(enosys());
       },
@@ -95,10 +108,21 @@
         callback(enosys());
       },
       open(path, flags, mode, callback) {
-        callback(enosys());
+        /*
+        outputBuf += decoder.decode(buf);
+        const nl = outputBuf.lastIndexOf("\n");
+        if (nl != -1) {
+          console.log(outputBuf.substr(0, nl));
+          outputBuf = outputBuf.substr(nl + 1);
+        }
+        return buf.length;
+        */
+        console.info({ path, flags, mode, callback });
+        return new ArrayBuffer([1, 2, 3]);
+        // callback(enosys("open"));
       },
       read(fd, buffer, offset, length, position, callback) {
-        callback(enosys());
+        callback(enosys("read"));
       },
       readdir(path, callback) {
         callback(enosys());
@@ -128,6 +152,8 @@
         callback(enosys());
       },
     };
+  } else {
+    console.info("we have global.fs");
   }
 
   if (!global.process) {
@@ -615,10 +641,13 @@
         offset += 8;
       });
 
+      console.info("exports.run");
       this._inst.exports.run(argc, argv);
+      this._resolveExitPromise();
       if (this.exited) {
         this._resolveExitPromise();
       }
+      console.info("___ awaiting _exitPromise");
       await this._exitPromise;
     }
 
